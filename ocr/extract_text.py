@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import Optional, Union
 
+
+
 try:
     import pytesseract
     from PIL import Image
@@ -56,3 +58,4 @@ def get_expression_from_image(src: ImageInput) -> Optional[str]:
         cleaned = cleaned.replace(old, new)
 
     return cleaned or None
+

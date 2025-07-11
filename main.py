@@ -14,12 +14,16 @@ The pipeline consists of the following steps:
 5. **Evaluation** with :func:`compiler.evaluator.eval_ast` to compute the
    final result.
 """
+
+"""Tesseract OCR helper for extracting math expressions from images."""
+
 from __future__ import annotations
 
 import argparse
 from typing import Optional
 
 from ocr.extract_text import get_expression_from_image
+
 from utils.image_cleaner import clean_image
 from compiler import lexer  # noqa:F401 - ensure lexer is registered
 from compiler.parser import parser
@@ -42,6 +46,7 @@ def process_image(image_path: str) -> Optional[float]:
         result = eval_ast(ast)
         print(f"Evaluated result: {result}")
         return result
+
     except Exception as exc:  # pragma: no cover - runtime failure
         print(f"Failed to evaluate expression: {exc}")
         return None
@@ -62,6 +67,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 1
     print(f"Result: {result}")
     return 0
+
 
 
 if __name__ == "__main__":  # pragma: no cover - CLI entry
