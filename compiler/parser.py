@@ -17,7 +17,6 @@ import ply.yacc as yacc
 from .lexer import lexer, tokens
 
 
-
 @dataclass
 class Number:
     value: Union[int, float]

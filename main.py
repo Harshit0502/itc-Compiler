@@ -11,7 +11,7 @@ The pipeline consists of the following steps:
    improve OCR accuracy.
 3. **Lexing** with :mod:`compiler.lexer` to tokenize the expression.
 4. **Parsing** via :mod:`compiler.parser` to build an abstract syntax tree.
-5. **Evaluation** with :func:`compiler.evaluator.eval_ast` to compute the
+5. **Evaluation** with :func:`compiler.evaluator.evaluate` to compute the
    final result.
 """
 
@@ -21,11 +21,10 @@ import argparse
 from typing import Optional
 
 from ocr.extract_text import get_expression_from_image
-
 from utils.image_cleaner import clean_image
 from compiler import lexer  # noqa:F401 - ensure lexer is registered
 from compiler.parser import parser
-from compiler.evaluator import eval_ast
+from compiler.evaluator import evaluate
 
 
 def process_image(image_path: str) -> Optional[float]:
@@ -41,7 +40,7 @@ def process_image(image_path: str) -> Optional[float]:
     try:
         ast = parser.parse(text)
         print(f"Parsed AST: {ast}")
-        result = eval_ast(ast)
+        result = evaluate(ast)
         print(f"Evaluated result: {result}")
         return result
 
@@ -65,6 +64,5 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 1
     print(f"Result: {result}")
     return 0
-
 if __name__ == "__main__":  # pragma: no cover - CLI entry
     raise SystemExit(main())
