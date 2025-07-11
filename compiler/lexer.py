@@ -1,4 +1,5 @@
-"""Simple lexer for arithmetic expressions using PLY."""
+"""Lexical analyzer for arithmetic expressions using :mod:`ply`."""
+
 import ply.lex as lex
 
 # Token names
@@ -34,7 +35,10 @@ def t_newline(t):
 
 
 def t_error(t):
-    raise SyntaxError(f"Illegal character '{t.value[0]}' at position {t.lexpos}")
+    """Handle illegal characters by printing an error and skipping."""
+    print(f"Illegal character {t.value[0]!r} at position {t.lexpos}")
+    t.lexer.skip(1)
+
 
 
 lexer = lex.lex()
