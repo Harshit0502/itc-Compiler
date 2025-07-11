@@ -3,7 +3,7 @@ opencv-python
 ply
 graphviz
 matplotlib
-# Additional dependencies used by the project
 pillow
 numpy
 streamlit
+textblob
