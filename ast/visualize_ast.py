@@ -47,3 +47,8 @@ def visualize_ast(ast: ASTNode, output_file: str = "ast.png", *,
 
     dot.render(outfile=str(path), cleanup=True)
     return str(path)
+
+
+def get_ast_plot(ast: ASTNode, path: str = "ast.png") -> str:
+    """Convenience wrapper returning path to rendered AST image."""
+    return visualize_ast(ast, output_file=path)

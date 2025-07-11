@@ -7,6 +7,7 @@ try:
     import pytesseract
     from PIL import Image
     import numpy as np
+    from utils.image_cleaner import clean_image
 except ImportError:  # pragma: no cover - environment might not have deps
     pytesseract = None  # type: ignore
     Image = None  # type: ignore
@@ -22,11 +23,18 @@ def _load_image(src: ImageInput) -> Optional["Image.Image"]:
         return None
     if isinstance(src, str):
         try:
+            if np is not None:
+                arr = clean_image(src)
+                if arr is not None:
+                    return Image.fromarray(arr)
             return Image.open(src)
         except Exception:
             return None
     if np is not None and isinstance(src, np.ndarray):
         try:
+            arr = clean_image(src)
+            if arr is not None:
+                return Image.fromarray(arr)
             return Image.fromarray(src)
         except Exception:
             return None
@@ -48,7 +56,8 @@ def get_expression_from_image(src: ImageInput) -> Optional[str]:
         img.close()
 
     # Remove whitespace and newlines
-    cleaned = text.replace("\n", "").replace(" ", "").strip()
+    cleaned = text.replace("\n", " ").replace("\r", " ").strip()
+    cleaned = " ".join(cleaned.split())
 
     # Common OCR corrections
     replacements = {"x": "*", "X": "*", "l": "1"}

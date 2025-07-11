@@ -11,6 +11,8 @@ from ocr.extract_text import get_expression_from_image
 from compiler import lexer  # noqa: F401 - register lexer tokens
 from compiler.parser import parser
 from compiler.evaluator import evaluate
+from ast.visualize_ast import get_ast_plot
+from symbol_table import SymbolTable
 
 
 def run_pipeline(img_path: str) -> tuple[str | None, object | None, float | None]:
@@ -23,9 +25,10 @@ def run_pipeline(img_path: str) -> tuple[str | None, object | None, float | None
     if not expr:
         return None, None, None
 
+    symbols = SymbolTable()
     try:
         ast = parser.parse(expr)
-        result = evaluate(ast)
+        result = evaluate(ast, symbols)
         return expr, ast, result
     except Exception:
         return expr, None, None
@@ -40,24 +43,29 @@ def main() -> None:
         img = Image.open(uploaded)
         st.image(img, caption="Uploaded Image", use_column_width=True)
 
-        # Write to a temporary file so existing pipeline can load it
         with tempfile.NamedTemporaryFile(delete=False, suffix=Path(uploaded.name).suffix) as tmp:
             img.save(tmp.name)
             tmp_path = tmp.name
 
-        expr, ast, result = run_pipeline(tmp_path)
-        Path(tmp_path).unlink(missing_ok=True)
+        cleaned = preprocess_image(tmp_path)
+        expr = get_expression_from_image(cleaned) if cleaned is not None else None
 
         if expr is None:
             st.error("Could not extract expression from image.")
-        else:
-            st.write(f"**Extracted expression:** `{expr}`")
-            if ast is not None:
-                st.write(f"**AST:** {ast}")
-            if result is not None:
+            return
+
+        st.text_area("Extracted code", expr, height=100)
+        if st.button("Compile"):
+            symbols = SymbolTable()
+            try:
+                ast = parser.parse(expr)
+                plot = get_ast_plot(ast)
+                st.image(plot, caption="AST")
+                result = evaluate(ast, symbols)
                 st.success(f"Result: {result}")
-            else:
-                st.error("Failed to evaluate expression.")
+            except Exception as exc:
+                st.error(str(exc))
+        Path(tmp_path).unlink(missing_ok=True)
 
 
 if __name__ == "__main__":

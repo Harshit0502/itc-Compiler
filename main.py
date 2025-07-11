@@ -23,6 +23,8 @@ from typing import Optional
 
 from ocr.extract_text import get_expression_from_image
 from utils.image_cleaner import preprocess_image
+from symbol_table import SymbolTable
+from error_handler import LexerError, ParserError, EvaluationError
 
 from compiler import lexer  # noqa:F401 - ensure lexer is registered
 from compiler.parser import parser
@@ -35,21 +37,23 @@ def process_image(image_path: str) -> Optional[float]:
     if cleaned is None:
         print("Failed to load image or OpenCV unavailable")
         return None
-    print(f"Preprocessed image shape: {cleaned.shape}")
+    print(f"Preprocessed image shape: {getattr(cleaned, 'shape', '?')}")
 
     text = get_expression_from_image(cleaned)
     print(f"Extracted text: {text!r}")
     if not text:
         print("OCR failed or returned no text")
         return None
+
+    symbols = SymbolTable()
     try:
         ast = parser.parse(text)
         print(f"Parsed AST: {ast}")
-        result = evaluate(ast)
+        result = evaluate(ast, symbols)
         print(f"Evaluated result: {result}")
         return result
 
-    except Exception as exc:  # pragma: no cover - runtime failure
+    except (LexerError, ParserError, EvaluationError) as exc:  # pragma: no cover
         print(f"Failed to evaluate expression: {exc}")
         return None
 
