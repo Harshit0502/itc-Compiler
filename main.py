@@ -33,6 +33,7 @@ def process_image(image_path: str) -> Optional[float]:
 
     text = extract_text(cleaned)
     print(f"Extracted text: {text!r}")
+
     text = extract_text(cleaned)
     if not text:
         print("OCR failed or returned no text")
@@ -43,6 +44,7 @@ def process_image(image_path: str) -> Optional[float]:
         result = eval_ast(ast)
         print(f"Evaluated result: {result}")
         return result
+
         return eval_ast(ast)
 
     except Exception as exc:  # pragma: no cover - runtime failure
@@ -64,6 +66,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     if result is None:
         return 1
     print(f"Result: {result}")
+
     parser_.add_argument("image", help="path to the image file")
     args = parser_.parse_args(argv)
 
