@@ -6,3 +6,4 @@ matplotlib
 # Additional dependencies used by the project
 pillow
 numpy
+streamlit
