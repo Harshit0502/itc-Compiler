@@ -58,4 +58,3 @@ def preprocess_image(image_path: str) -> Optional[ImageArray]:
 
 # Backwards compatibility with previous API
 clean_image = preprocess_image
-

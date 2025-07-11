@@ -37,8 +37,6 @@ def process_image(image_path: str) -> Optional[float]:
         return None
     print(f"Preprocessed image shape: {cleaned.shape}")
 
-
-
     text = get_expression_from_image(cleaned)
     print(f"Extracted text: {text!r}")
     if not text:
@@ -49,8 +47,7 @@ def process_image(image_path: str) -> Optional[float]:
         print(f"Parsed AST: {ast}")
         result = evaluate(ast)
         print(f"Evaluated result: {result}")
-        return result
-
+        return resul 
     except Exception as exc:  # pragma: no cover - runtime failure
         print(f"Failed to evaluate expression: {exc}")
         return None
