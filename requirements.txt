@@ -7,3 +7,4 @@ pillow
 numpy
 streamlit
 textblob
+networkx

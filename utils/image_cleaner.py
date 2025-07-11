@@ -22,39 +22,37 @@ except ImportError:  # pragma: no cover - environment might not have deps
 ImageArray = "np.ndarray"
 
 
-def preprocess_image(image_path: str) -> Optional[ImageArray]:
-    """Return a cleaned image array loaded from ``image_path``.
+def binarize(image: "np.ndarray") -> "np.ndarray":
+    """Return a thresholded version of ``image`` using Otsu."""
+    if cv2 is None:
+        return image
+    _, thresh = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    return thresh
 
-    The function performs the following operations when ``opencv`` is
-    available:
-    1. Read the image from disk.
-    2. Convert it to grayscale.
-    3. Apply a slight Gaussian blur.
-    4. Binarise the result using Otsu's thresholding.
-    5. Resize up if the image is very small to improve OCR accuracy.
 
-    If ``opencv`` is not installed or the image cannot be loaded, ``None`` is
-    returned.
-    """
+def remove_noise(image: "np.ndarray") -> "np.ndarray":
+    """Denoise small elements using median blur."""
+    if cv2 is None:
+        return image
+    return cv2.medianBlur(image, 3)
 
-    if cv2 is None or np is None:  # pragma: no cover - environment may lack deps
+
+def clean_image(image: "np.ndarray | str") -> Optional["np.ndarray"]:
+    """Clean ``image`` which may be a path or array."""
+    if cv2 is None or np is None:
         return None
-
-    img = cv2.imread(image_path)
-    if img is None:
-        return None
-
+    if isinstance(image, str):
+        img = cv2.imread(image)
+        if img is None:
+            return None
+    else:
+        img = image
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray, (3, 3), 0)
-    _, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-
-    h, w = thresh.shape[:2]
-    if max(h, w) < 600:
-        scale = 600.0 / max(h, w)
-        thresh = cv2.resize(thresh, None, fx=scale, fy=scale, interpolation=cv2.INTER_LINEAR)
-
+    gray = cv2.resize(gray, None, fx=2, fy=2, interpolation=cv2.INTER_LINEAR)
+    gray = remove_noise(gray)
+    thresh = binarize(gray)
     return thresh
 
 
 # Backwards compatibility with previous API
-clean_image = preprocess_image
+preprocess_image = clean_image
