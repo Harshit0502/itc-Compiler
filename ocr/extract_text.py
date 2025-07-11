@@ -17,6 +17,21 @@ except ImportError:  # pragma: no cover - environment might not have deps
 ImageInput = Union[str, "np.ndarray"]
 
 
+def extract_text_from_image(image_path: str) -> Optional[str]:
+    """Return raw OCR text extracted from ``image_path``."""
+    if pytesseract is None or Image is None:
+        return None
+    try:
+        img = Image.open(image_path)
+    except Exception:
+        return None
+    try:
+        text = pytesseract.image_to_string(img)
+    finally:
+        img.close()
+    return text.strip()
+
+
 def _load_image(src: ImageInput) -> Optional["Image.Image"]:
     """Return a PIL image loaded from ``src`` which may be a path or ndarray."""
     if Image is None:
