@@ -1,11 +1,14 @@
-"""Image preprocessing utilities.
 
-This module contains helper functions to clean and prepare images
-for OCR using ``opencv``. The provided :func:`clean_image` function
-performs a minimal set of operations (grayscale conversion and
-thresholding). If ``opencv`` is not available, the function simply
-returns the path to the original image.
+"""Image preprocessing utilities for OCR.
+
+This module provides :func:`preprocess_image` which loads an image from disk
+and performs a few typical cleaning steps to make OCR more reliable.  The
+function returns the processed image as a NumPy array so it can be passed
+directly to :mod:`pytesseract` or other OCR engines.
 """
+from __future__ import annotations
+
+
 from typing import Optional
 
 try:
@@ -16,17 +19,43 @@ except ImportError:  # pragma: no cover - environment might not have deps
     np = None  # type: ignore
 
 
-def clean_image(image_path: str) -> Optional[str]:
-    """Preprocess ``image_path`` for OCR and return path to cleaned image."""
-    if cv2 is None:
-        return image_path
+ImageArray = "np.ndarray"
+
+
+def preprocess_image(image_path: str) -> Optional[ImageArray]:
+    """Return a cleaned image array loaded from ``image_path``.
+
+    The function performs the following operations when ``opencv`` is
+    available:
+    1. Read the image from disk.
+    2. Convert it to grayscale.
+    3. Apply a slight Gaussian blur.
+    4. Binarise the result using Otsu's thresholding.
+    5. Resize up if the image is very small to improve OCR accuracy.
+
+    If ``opencv`` is not installed or the image cannot be loaded, ``None`` is
+    returned.
+    """
+
+    if cv2 is None or np is None:  # pragma: no cover - environment may lack deps
+        return None
 
     img = cv2.imread(image_path)
     if img is None:
-        return image_path
+        return None
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    cleaned_path = image_path.rsplit(".", 1)[0] + "_clean.png"
-    cv2.imwrite(cleaned_path, thresh)
-    return cleaned_path
+    blur = cv2.GaussianBlur(gray, (3, 3), 0)
+    _, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    h, w = thresh.shape[:2]
+    if max(h, w) < 600:
+        scale = 600.0 / max(h, w)
+        thresh = cv2.resize(thresh, None, fx=scale, fy=scale, interpolation=cv2.INTER_LINEAR)
+
+    return thresh
+
+
+# Backwards compatibility with previous API
+clean_image = preprocess_image
+

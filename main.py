@@ -7,7 +7,8 @@ The pipeline consists of the following steps:
 
 1. **OCR** using :func:`ocr.extract_text.get_expression_from_image` which
    relies on Tesseract.
-2. **Image cleaning** performed by :func:`utils.image_cleaner.clean_image` to
+2. **Image cleaning** performed by :func:`utils.image_cleaner.preprocess_image` to
+
    improve OCR accuracy.
 3. **Lexing** with :mod:`compiler.lexer` to tokenize the expression.
 4. **Parsing** via :mod:`compiler.parser` to build an abstract syntax tree.
@@ -21,7 +22,8 @@ import argparse
 from typing import Optional
 
 from ocr.extract_text import get_expression_from_image
-from utils.image_cleaner import clean_image
+from utils.image_cleaner import preprocess_image
+
 from compiler import lexer  # noqa:F401 - ensure lexer is registered
 from compiler.parser import parser
 from compiler.evaluator import evaluate
@@ -29,8 +31,13 @@ from compiler.evaluator import evaluate
 
 def process_image(image_path: str) -> Optional[float]:
     """Process ``image_path`` and return the evaluated result."""
-    cleaned = clean_image(image_path)
-    print(f"Cleaned image saved to: {cleaned}")
+    cleaned = preprocess_image(image_path)
+    if cleaned is None:
+        print("Failed to load image or OpenCV unavailable")
+        return None
+    print(f"Preprocessed image shape: {cleaned.shape}")
+
+
 
     text = get_expression_from_image(cleaned)
     print(f"Extracted text: {text!r}")
@@ -64,5 +71,6 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 1
     print(f"Result: {result}")
     return 0
+
 if __name__ == "__main__":  # pragma: no cover - CLI entry
     raise SystemExit(main())

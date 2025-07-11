@@ -41,5 +41,3 @@ def evaluate(node: Union[AST, tuple, NumberLike]) -> NumberLike:
 
 # Backwards compatibility with older code
 eval_ast = evaluate
-
-
