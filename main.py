@@ -21,7 +21,7 @@ from __future__ import annotations
 import argparse
 from typing import Optional
 
-from ocr.extract_text import get_expression_from_image
+from ocr.extract_text import get_expression_from_image, extract_text_from_image
 from utils.image_cleaner import preprocess_image
 from symbol_table import SymbolTable
 from error_handler import LexerError, ParserError, EvaluationError
@@ -29,6 +29,30 @@ from error_handler import LexerError, ParserError, EvaluationError
 from compiler import lexer  # noqa:F401 - ensure lexer is registered
 from compiler.parser import parser
 from compiler.evaluator import evaluate
+from textblob import TextBlob
+import ply.lex as lex
+import compiler.lexer as lex_module
+
+
+def run_pipeline(image_path: str) -> Optional[float]:
+    """Complete OCR-to-evaluation pipeline."""
+    raw_text = extract_text_from_image(image_path)
+    if not raw_text:
+        print("OCR produced no text")
+        return None
+
+    cleaned_text = str(TextBlob(raw_text).correct())
+    print(f"Corrected text: {cleaned_text}")
+
+    temp_lexer = lex.lex(module=lex_module)
+    temp_lexer.input(cleaned_text)
+    tokens = list(temp_lexer)
+    print(f"Tokens: {[t.type for t in tokens]}")
+
+    ast = parser.parse(cleaned_text)
+    result = evaluate(ast)
+    print(f"Result: {result}")
+    return result
 
 
 def process_image(image_path: str) -> Optional[float]:
