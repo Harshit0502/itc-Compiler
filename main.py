@@ -15,8 +15,6 @@ The pipeline consists of the following steps:
    final result.
 """
 
-"""Tesseract OCR helper for extracting math expressions from images."""
-
 from __future__ import annotations
 
 import argparse
@@ -67,8 +65,6 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 1
     print(f"Result: {result}")
     return 0
-
-
 
 if __name__ == "__main__":  # pragma: no cover - CLI entry
     raise SystemExit(main())

@@ -1,11 +1,21 @@
-"""Parser and AST builder for arithmetic expressions using PLY."""
+"""Parser and AST builder for arithmetic expressions using PLY.
+
+This module defines a grammar for simple arithmetic and constructs an
+Abstract Syntax Tree (AST) from a source string.  The exposed ``parser``
+object can be used directly via ``parser.parse(text, lexer=lexer)`` or
+through the convenience :func:`parse` wrapper defined below.
+"""
+
 from __future__ import annotations
+
+
 from dataclasses import dataclass
 from typing import Union
 
 import ply.yacc as yacc
 
-from .lexer import tokens
+from .lexer import lexer, tokens
+
 
 
 @dataclass
@@ -56,7 +66,17 @@ def p_factor_group(p):
 
 
 def p_error(p):
-    raise SyntaxError(f"Syntax error at {getattr(p, 'value', None)}")
+    """Hook called by PLY when a syntax error is encountered."""
+    if p is None:
+        raise SyntaxError("Syntax error at EOF")
+    raise SyntaxError(f"Syntax error at {p.value!r}")
 
 
 parser = yacc.yacc(start="expression")
+
+
+def parse(text: str, *, lexer_obj=lexer) -> AST:
+    """Parse ``text`` into an AST using ``lexer_obj`` (defaults to :data:`lexer`)."""
+    return parser.parse(text, lexer=lexer_obj)
+
+
