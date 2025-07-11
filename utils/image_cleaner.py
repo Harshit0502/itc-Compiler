@@ -1,3 +1,4 @@
+
 """Image preprocessing utilities for OCR.
 
 This module provides :func:`preprocess_image` which loads an image from disk
@@ -6,6 +7,7 @@ function returns the processed image as a NumPy array so it can be passed
 directly to :mod:`pytesseract` or other OCR engines.
 """
 from __future__ import annotations
+
 
 from typing import Optional
 
