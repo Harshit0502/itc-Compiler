@@ -6,7 +6,9 @@ recognized by Tesseract OCR.
 """
 from typing import Optional
 
+
 from utils.image_cleaner import clean_image
+
 
 try:
     import pytesseract
@@ -38,7 +40,6 @@ def extract_text(image_path: str) -> Optional[str]:
     except Exception:
         return None
 
-
 def get_expression_from_image(image_path: str) -> Optional[str]:
     """Return a math expression string extracted from ``image_path``.
 
@@ -47,3 +48,4 @@ def get_expression_from_image(image_path: str) -> Optional[str]:
     """
     cleaned = clean_image(image_path)
     return extract_text(cleaned) if cleaned else None
+
