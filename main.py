@@ -47,7 +47,8 @@ def process_image(image_path: str) -> Optional[float]:
         print(f"Parsed AST: {ast}")
         result = evaluate(ast)
         print(f"Evaluated result: {result}")
-        return resul 
+        return result
+
     except Exception as exc:  # pragma: no cover - runtime failure
         print(f"Failed to evaluate expression: {exc}")
         return None
@@ -68,6 +69,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 1
     print(f"Result: {result}")
     return 0
+
 
 if __name__ == "__main__":  # pragma: no cover - CLI entry
     raise SystemExit(main())
