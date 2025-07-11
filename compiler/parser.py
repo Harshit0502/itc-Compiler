@@ -8,6 +8,7 @@ through the convenience :func:`parse` wrapper defined below.
 
 from __future__ import annotations
 
+
 from dataclasses import dataclass
 from typing import Union
 
@@ -76,4 +77,5 @@ parser = yacc.yacc(start="expression")
 def parse(text: str, *, lexer_obj=lexer) -> AST:
     """Parse ``text`` into an AST using ``lexer_obj`` (defaults to :data:`lexer`)."""
     return parser.parse(text, lexer=lexer_obj)
+
 

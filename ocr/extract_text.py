@@ -56,3 +56,4 @@ def get_expression_from_image(src: ImageInput) -> Optional[str]:
         cleaned = cleaned.replace(old, new)
 
     return cleaned or None
+

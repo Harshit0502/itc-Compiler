@@ -1,5 +1,6 @@
 """Recursive evaluator for arithmetic AST nodes."""
 
+
 from typing import Union
 
 from .parser import AST, BinOp, Number
@@ -40,4 +41,5 @@ def evaluate(node: Union[AST, tuple, NumberLike]) -> NumberLike:
 
 # Backwards compatibility with older code
 eval_ast = evaluate
+
 

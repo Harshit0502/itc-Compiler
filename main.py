@@ -14,6 +14,7 @@ The pipeline consists of the following steps:
 5. **Evaluation** with :func:`compiler.evaluator.evaluate` to compute the
    final result.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -42,6 +43,7 @@ def process_image(image_path: str) -> Optional[float]:
         result = evaluate(ast)
         print(f"Evaluated result: {result}")
         return result
+
     except Exception as exc:  # pragma: no cover - runtime failure
         print(f"Failed to evaluate expression: {exc}")
         return None
@@ -62,7 +64,5 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 1
     print(f"Result: {result}")
     return 0
-
-
 if __name__ == "__main__":  # pragma: no cover - CLI entry
     raise SystemExit(main())
